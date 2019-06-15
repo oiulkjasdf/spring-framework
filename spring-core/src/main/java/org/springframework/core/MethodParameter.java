@@ -57,42 +57,56 @@ import org.springframework.util.ClassUtils;
  * @since 2.0
  * @see org.springframework.core.annotation.SynthesizingMethodParameter
  */
+/*方法参数*/
 public class MethodParameter {
 
+	/*final 注解组 空组*/
 	private static final Annotation[] EMPTY_ANNOTATION_ARRAY = new Annotation[0];
 
+	/*jdk 中  可执行文件 他是 jdk 中 构造器 的 父类*/
 	private final Executable executable;
 
+	/*参数位置*/
 	private final int parameterIndex;
 
 	@Nullable
+	/*不允许 java 编译器 优化*/
 	private volatile Parameter parameter;
 
+	/*嵌套等级 */
 	private int nestingLevel = 1;
 
 	/** Map from Integer level to Integer type index. */
 	@Nullable
+			/*类型 索引级别 */
 	Map<Integer, Integer> typeIndexesPerLevel;
 
 	@Nullable
+	/*  不允许 java编译器优化  包含类类型   */
 	private volatile Class<?> containingClass;
 
 	@Nullable
+	/*参数类型*/
 	private volatile Class<?> parameterType;
 
 	@Nullable
+	/*通用参数类型*/
 	private volatile Type genericParameterType;
 
 	@Nullable
+	/*注解集合  参数 注解*/
 	private volatile Annotation[] parameterAnnotations;
 
 	@Nullable
-	private volatile ParameterNameDiscoverer parameterNameDiscoverer;
+	/*参数 名字 发现者 里面有两个 string 集合  */
+	private volatile org.springframework.core.ParameterNameDiscoverer parameterNameDiscoverer;
 
 	@Nullable
+	/*参数名*/
 	private volatile String parameterName;
 
 	@Nullable
+	/*嵌套方法参数  他自己    他自己可以里面包含一个 他自己对象？  什么操作  ？*/
 	private volatile MethodParameter nestedMethodParameter;
 
 
@@ -103,6 +117,7 @@ public class MethodParameter {
 	 * return type; 0 for the first method parameter; 1 for the second method
 	 * parameter, etc.
 	 */
+	/*构造器  方法  参数等级  嵌套等级 */
 	public MethodParameter(Method method, int parameterIndex) {
 		this(method, parameterIndex, 1);
 	}
@@ -117,6 +132,7 @@ public class MethodParameter {
 	 * (typically 1; e.g. in case of a List of Lists, 1 would indicate the
 	 * nested List, whereas 2 would indicate the element of the nested List)
 	 */
+	/*也是一个构造器  可以加入  嵌套等级 了*/
 	public MethodParameter(Method method, int parameterIndex, int nestingLevel) {
 		Assert.notNull(method, "Method must not be null");
 		this.executable = method;
@@ -129,6 +145,7 @@ public class MethodParameter {
 	 * @param constructor the Constructor to specify a parameter for
 	 * @param parameterIndex the index of the parameter
 	 */
+	/*构造器  默认为1 的  构造器 */
 	public MethodParameter(Constructor<?> constructor, int parameterIndex) {
 		this(constructor, parameterIndex, 1);
 	}
@@ -153,6 +170,7 @@ public class MethodParameter {
 	 * based on the same metadata and cache state that the original object was in.
 	 * @param original the original MethodParameter object to copy from
 	 */
+	/*自己构造自己？？？  尼玛  */
 	public MethodParameter(MethodParameter original) {
 		Assert.notNull(original, "Original must not be null");
 		this.executable = original.executable;
@@ -175,6 +193,9 @@ public class MethodParameter {
 	 * @return the Method, or {@code null} if none
 	 */
 	@Nullable
+	/*是否属于  方法  属于 则 返回方法   */
+
+	/*note method 和 构造器 Constructor 类对象 都继承于 Executable 抽象方法  */
 	public Method getMethod() {
 		return (this.executable instanceof Method ? (Method) this.executable : null);
 	}
@@ -185,6 +206,7 @@ public class MethodParameter {
 	 * @return the Constructor, or {@code null} if none
 	 */
 	@Nullable
+	/*是否属于构造方法  属于 则   返回*/
 	public Constructor<?> getConstructor() {
 		return (this.executable instanceof Constructor ? (Constructor<?>) this.executable : null);
 	}
@@ -192,6 +214,7 @@ public class MethodParameter {
 	/**
 	 * Return the class that declares the underlying Method or Constructor.
 	 */
+	/*获取类对象*/
 	public Class<?> getDeclaringClass() {
 		return this.executable.getDeclaringClass();
 	}
@@ -200,6 +223,8 @@ public class MethodParameter {
 	 * Return the wrapped member.
 	 * @return the Method or Constructor as Member
 	 */
+	/*获取 成员 ？*/
+	/*fixme   看不懂  返回  Executable  对象  Member s还是一个  接口  为什么能返回  Executable*/
 	public Member getMember() {
 		return this.executable;
 	}
@@ -210,7 +235,13 @@ public class MethodParameter {
 	 * itself (i.e. at the method/constructor level, not at the parameter level).
 	 * @return the Method or Constructor as AnnotatedElement
 	 */
+	/*fixme 又是这种情况  */
 	public AnnotatedElement getAnnotatedElement() {
+		return this.executable;
+	}
+
+	/*fixme  看不懂  看不懂  */
+	public AnnotatedElement getAnnotatedElementa() {
 		return this.executable;
 	}
 
@@ -227,6 +258,7 @@ public class MethodParameter {
 	 * Return the {@link Parameter} descriptor for method/constructor parameter.
 	 * @since 5.0
 	 */
+	/*返回参数 */
 	public Parameter getParameter() {
 		if (this.parameterIndex < 0) {
 			throw new IllegalStateException("Cannot retrieve Parameter descriptor for method return type");
@@ -343,8 +375,8 @@ public class MethodParameter {
 	 */
 	public boolean isOptional() {
 		return (getParameterType() == Optional.class || hasNullableAnnotation() ||
-				(KotlinDetector.isKotlinReflectPresent() &&
-						KotlinDetector.isKotlinType(getContainingClass()) &&
+				(org.springframework.core.KotlinDetector.isKotlinReflectPresent() &&
+						org.springframework.core.KotlinDetector.isKotlinType(getContainingClass()) &&
 						KotlinDelegate.isOptional(this)));
 	}
 
@@ -590,7 +622,7 @@ public class MethodParameter {
 	 * this point; it just allows discovery to happen when the application calls
 	 * {@link #getParameterName()} (if ever).
 	 */
-	public void initParameterNameDiscovery(@Nullable ParameterNameDiscoverer parameterNameDiscoverer) {
+	public void initParameterNameDiscovery(@Nullable org.springframework.core.ParameterNameDiscoverer parameterNameDiscoverer) {
 		this.parameterNameDiscoverer = parameterNameDiscoverer;
 	}
 
@@ -606,7 +638,7 @@ public class MethodParameter {
 		if (this.parameterIndex < 0) {
 			return null;
 		}
-		ParameterNameDiscoverer discoverer = this.parameterNameDiscoverer;
+		org.springframework.core.ParameterNameDiscoverer discoverer = this.parameterNameDiscoverer;
 		if (discoverer != null) {
 			String[] parameterNames = null;
 			if (this.executable instanceof Method) {
@@ -750,8 +782,12 @@ public class MethodParameter {
 				"] does not match any parameter in the declaring executable");
 	}
 
+	/*一个 可执行 的类  参数 */
 	private static int validateIndex(Executable executable, int parameterIndex) {
+		/*获取参数的数量 ？？*/
+		/*fixme  理解不了  实现是 抛异常  为什么这里可以得到  一个 int 值呢 */
 		int count = executable.getParameterCount();
+		/*断言里面都可以写lamda表达式呢  哎 。。。。    */
 		Assert.isTrue(parameterIndex >= -1 && parameterIndex < count,
 				() -> "Parameter index needs to be between -1 and " + (count - 1));
 		return parameterIndex;

@@ -31,7 +31,7 @@ import org.springframework.lang.Nullable;
  * @since 2.0
  * @see BeanWrapper
  */
-public interface ConfigurablePropertyAccessor extends PropertyAccessor, PropertyEditorRegistry, TypeConverter {
+public interface ConfigurablePropertyAccessor extends org.springframework.beans.PropertyAccessor, org.springframework.beans.PropertyEditorRegistry, org.springframework.beans.TypeConverter {
 
 	/**
 	 * Specify a Spring 3.0 ConversionService to use for converting

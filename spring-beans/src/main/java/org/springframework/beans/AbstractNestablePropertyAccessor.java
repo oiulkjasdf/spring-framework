@@ -69,7 +69,7 @@ import org.springframework.util.StringUtils;
  * @see BeanWrapper
  * @see PropertyEditorRegistrySupport
  */
-public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyAccessor {
+public abstract class AbstractNestablePropertyAccessor extends org.springframework.beans.AbstractPropertyAccessor {
 
 	/**
 	 * We'll create a lot of these objects, so we don't want a new logger every time.
@@ -110,7 +110,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		if (registerDefaultEditors) {
 			registerDefaultEditors();
 		}
-		this.typeConverterDelegate = new TypeConverterDelegate(this);
+		this.typeConverterDelegate = new org.springframework.beans.TypeConverterDelegate(this);
 	}
 
 	/**
@@ -128,7 +128,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	 */
 	protected AbstractNestablePropertyAccessor(Class<?> clazz) {
 		registerDefaultEditors();
-		setWrappedInstance(BeanUtils.instantiateClass(clazz));
+		setWrappedInstance(org.springframework.beans.BeanUtils.instantiateClass(clazz));
 	}
 
 	/**
@@ -196,7 +196,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		this.nestedPath = (nestedPath != null ? nestedPath : "");
 		this.rootObject = (!this.nestedPath.isEmpty() ? rootObject : this.wrappedObject);
 		this.nestedPropertyAccessors = null;
-		this.typeConverterDelegate = new TypeConverterDelegate(this, this.wrappedObject);
+		this.typeConverterDelegate = new org.springframework.beans.TypeConverterDelegate(this, this.wrappedObject);
 	}
 
 	public final Object getWrappedInstance() {
@@ -233,13 +233,13 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	}
 
 	@Override
-	public void setPropertyValue(String propertyName, @Nullable Object value) throws BeansException {
+	public void setPropertyValue(String propertyName, @Nullable Object value) throws org.springframework.beans.BeansException {
 		AbstractNestablePropertyAccessor nestedPa;
 		try {
 			nestedPa = getPropertyAccessorForPropertyPath(propertyName);
 		}
-		catch (NotReadablePropertyException ex) {
-			throw new NotWritablePropertyException(getRootClass(), this.nestedPath + propertyName,
+		catch (org.springframework.beans.NotReadablePropertyException ex) {
+			throw new org.springframework.beans.NotWritablePropertyException(getRootClass(), this.nestedPath + propertyName,
 					"Nested property in path '" + propertyName + "' does not exist", ex);
 		}
 		PropertyTokenHolder tokens = getPropertyNameTokens(getFinalPath(nestedPa, propertyName));
@@ -247,7 +247,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	}
 
 	@Override
-	public void setPropertyValue(PropertyValue pv) throws BeansException {
+	public void setPropertyValue(org.springframework.beans.PropertyValue pv) throws org.springframework.beans.BeansException {
 		PropertyTokenHolder tokens = (PropertyTokenHolder) pv.resolvedTokens;
 		if (tokens == null) {
 			String propertyName = pv.getName();
@@ -255,8 +255,8 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 			try {
 				nestedPa = getPropertyAccessorForPropertyPath(propertyName);
 			}
-			catch (NotReadablePropertyException ex) {
-				throw new NotWritablePropertyException(getRootClass(), this.nestedPath + propertyName,
+			catch (org.springframework.beans.NotReadablePropertyException ex) {
+				throw new org.springframework.beans.NotWritablePropertyException(getRootClass(), this.nestedPath + propertyName,
 						"Nested property in path '" + propertyName + "' does not exist", ex);
 			}
 			tokens = getPropertyNameTokens(getFinalPath(nestedPa, propertyName));
@@ -270,7 +270,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		}
 	}
 
-	protected void setPropertyValue(PropertyTokenHolder tokens, PropertyValue pv) throws BeansException {
+	protected void setPropertyValue(PropertyTokenHolder tokens, PropertyValue pv) throws org.springframework.beans.BeansException {
 		if (tokens.keys != null) {
 			processKeyedProperty(tokens, pv);
 		}
@@ -284,7 +284,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		Object propValue = getPropertyHoldingValue(tokens);
 		PropertyHandler ph = getLocalPropertyHandler(tokens.actualName);
 		if (ph == null) {
-			throw new InvalidPropertyException(
+			throw new org.springframework.beans.InvalidPropertyException(
 					getRootClass(), this.nestedPath + tokens.actualName, "No property handler found");
 		}
 		Assert.state(tokens.keys != null, "No token keys");
@@ -311,7 +311,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				Array.set(propValue, arrayIndex, convertedValue);
 			}
 			catch (IndexOutOfBoundsException ex) {
-				throw new InvalidPropertyException(getRootClass(), this.nestedPath + tokens.canonicalName,
+				throw new org.springframework.beans.InvalidPropertyException(getRootClass(), this.nestedPath + tokens.canonicalName,
 						"Invalid array index in property path '" + tokens.canonicalName + "'", ex);
 			}
 		}
@@ -333,7 +333,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 						list.add(null);
 					}
 					catch (NullPointerException ex) {
-						throw new InvalidPropertyException(getRootClass(), this.nestedPath + tokens.canonicalName,
+						throw new org.springframework.beans.InvalidPropertyException(getRootClass(), this.nestedPath + tokens.canonicalName,
 								"Cannot set element with index " + index + " in List of size " +
 								size + ", accessed using property path '" + tokens.canonicalName +
 								"': List does not support filling up gaps with null elements");
@@ -346,7 +346,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 					list.set(index, convertedValue);
 				}
 				catch (IndexOutOfBoundsException ex) {
-					throw new InvalidPropertyException(getRootClass(), this.nestedPath + tokens.canonicalName,
+					throw new org.springframework.beans.InvalidPropertyException(getRootClass(), this.nestedPath + tokens.canonicalName,
 							"Invalid list index in property path '" + tokens.canonicalName + "'", ex);
 				}
 			}
@@ -372,7 +372,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		}
 
 		else {
-			throw new InvalidPropertyException(getRootClass(), this.nestedPath + tokens.canonicalName,
+			throw new org.springframework.beans.InvalidPropertyException(getRootClass(), this.nestedPath + tokens.canonicalName,
 					"Property referenced in indexed property path '" + tokens.canonicalName +
 					"' is neither an array nor a List nor a Map; returned value was [" + propValue + "]");
 		}
@@ -390,8 +390,8 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		try {
 			propValue = getPropertyValue(getterTokens);
 		}
-		catch (NotReadablePropertyException ex) {
-			throw new NotWritablePropertyException(getRootClass(), this.nestedPath + tokens.canonicalName,
+		catch (org.springframework.beans.NotReadablePropertyException ex) {
+			throw new org.springframework.beans.NotWritablePropertyException(getRootClass(), this.nestedPath + tokens.canonicalName,
 					"Cannot access indexed value in property referenced " +
 					"in indexed property path '" + tokens.canonicalName + "'", ex);
 		}
@@ -404,7 +404,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				propValue = setDefaultValue(getterTokens);
 			}
 			else {
-				throw new NullValueInNestedPathException(getRootClass(), this.nestedPath + tokens.canonicalName,
+				throw new org.springframework.beans.NullValueInNestedPathException(getRootClass(), this.nestedPath + tokens.canonicalName,
 						"Cannot access indexed value in property referenced " +
 						"in indexed property path '" + tokens.canonicalName + "': returned null");
 			}
@@ -472,19 +472,19 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 					// May happen e.g. with Groovy-generated methods
 					cause = cause.getCause();
 				}
-				throw new MethodInvocationException(propertyChangeEvent, cause);
+				throw new org.springframework.beans.MethodInvocationException(propertyChangeEvent, cause);
 			}
 		}
 		catch (Exception ex) {
 			PropertyChangeEvent pce = new PropertyChangeEvent(
 					getRootInstance(), this.nestedPath + tokens.canonicalName, oldValue, pv.getValue());
-			throw new MethodInvocationException(pce, ex);
+			throw new org.springframework.beans.MethodInvocationException(pce, ex);
 		}
 	}
 
 	@Override
 	@Nullable
-	public Class<?> getPropertyType(String propertyName) throws BeansException {
+	public Class<?> getPropertyType(String propertyName) throws org.springframework.beans.BeansException {
 		try {
 			PropertyHandler ph = getPropertyHandler(propertyName);
 			if (ph != null) {
@@ -504,7 +504,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				}
 			}
 		}
-		catch (InvalidPropertyException ex) {
+		catch (org.springframework.beans.InvalidPropertyException ex) {
 			// Consider as not determinable.
 		}
 		return null;
@@ -512,7 +512,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 
 	@Override
 	@Nullable
-	public TypeDescriptor getPropertyTypeDescriptor(String propertyName) throws BeansException {
+	public TypeDescriptor getPropertyTypeDescriptor(String propertyName) throws org.springframework.beans.BeansException {
 		try {
 			AbstractNestablePropertyAccessor nestedPa = getPropertyAccessorForPropertyPath(propertyName);
 			String finalPath = getFinalPath(nestedPa, propertyName);
@@ -531,7 +531,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				}
 			}
 		}
-		catch (InvalidPropertyException ex) {
+		catch (org.springframework.beans.InvalidPropertyException ex) {
 			// Consider as not determinable.
 		}
 		return null;
@@ -550,7 +550,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				return true;
 			}
 		}
-		catch (InvalidPropertyException ex) {
+		catch (org.springframework.beans.InvalidPropertyException ex) {
 			// Cannot be evaluated, so can't be readable.
 		}
 		return false;
@@ -569,7 +569,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				return true;
 			}
 		}
-		catch (InvalidPropertyException ex) {
+		catch (org.springframework.beans.InvalidPropertyException ex) {
 			// Cannot be evaluated, so can't be writable.
 		}
 		return false;
@@ -587,7 +587,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		catch (ConverterNotFoundException | IllegalStateException ex) {
 			PropertyChangeEvent pce =
 					new PropertyChangeEvent(getRootInstance(), this.nestedPath + propertyName, oldValue, newValue);
-			throw new ConversionNotSupportedException(pce, requiredType, ex);
+			throw new org.springframework.beans.ConversionNotSupportedException(pce, requiredType, ex);
 		}
 		catch (ConversionException | IllegalArgumentException ex) {
 			PropertyChangeEvent pce =
@@ -606,7 +606,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 
 	@Override
 	@Nullable
-	public Object getPropertyValue(String propertyName) throws BeansException {
+	public Object getPropertyValue(String propertyName) throws org.springframework.beans.BeansException {
 		AbstractNestablePropertyAccessor nestedPa = getPropertyAccessorForPropertyPath(propertyName);
 		PropertyTokenHolder tokens = getPropertyNameTokens(getFinalPath(nestedPa, propertyName));
 		return nestedPa.getPropertyValue(tokens);
@@ -614,12 +614,12 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 
 	@SuppressWarnings("unchecked")
 	@Nullable
-	protected Object getPropertyValue(PropertyTokenHolder tokens) throws BeansException {
+	protected Object getPropertyValue(PropertyTokenHolder tokens) throws org.springframework.beans.BeansException {
 		String propertyName = tokens.canonicalName;
 		String actualName = tokens.actualName;
 		PropertyHandler ph = getLocalPropertyHandler(actualName);
 		if (ph == null || !ph.isReadable()) {
-			throw new NotReadablePropertyException(getRootClass(), this.nestedPath + propertyName);
+			throw new org.springframework.beans.NotReadablePropertyException(getRootClass(), this.nestedPath + propertyName);
 		}
 		try {
 			Object value = ph.getValue();
@@ -629,7 +629,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 						value = setDefaultValue(new PropertyTokenHolder(tokens.actualName));
 					}
 					else {
-						throw new NullValueInNestedPathException(getRootClass(), this.nestedPath + propertyName,
+						throw new org.springframework.beans.NullValueInNestedPathException(getRootClass(), this.nestedPath + propertyName,
 								"Cannot access indexed value of property referenced in indexed " +
 										"property path '" + propertyName + "': returned null");
 					}
@@ -639,7 +639,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				for (int i = 0; i < tokens.keys.length; i++) {
 					String key = tokens.keys[i];
 					if (value == null) {
-						throw new NullValueInNestedPathException(getRootClass(), this.nestedPath + propertyName,
+						throw new org.springframework.beans.NullValueInNestedPathException(getRootClass(), this.nestedPath + propertyName,
 								"Cannot access indexed value of property referenced in indexed " +
 										"property path '" + propertyName + "': returned null");
 					}
@@ -659,7 +659,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 						Set<Object> set = (Set<Object>) value;
 						int index = Integer.parseInt(key);
 						if (index < 0 || index >= set.size()) {
-							throw new InvalidPropertyException(getRootClass(), this.nestedPath + propertyName,
+							throw new org.springframework.beans.InvalidPropertyException(getRootClass(), this.nestedPath + propertyName,
 									"Cannot get element with index " + index + " from Set of size " +
 											set.size() + ", accessed using property path '" + propertyName + "'");
 						}
@@ -682,7 +682,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 						value = map.get(convertedMapKey);
 					}
 					else {
-						throw new InvalidPropertyException(getRootClass(), this.nestedPath + propertyName,
+						throw new org.springframework.beans.InvalidPropertyException(getRootClass(), this.nestedPath + propertyName,
 								"Property referenced in indexed property path '" + propertyName +
 										"' is neither an array nor a List nor a Set nor a Map; returned value was [" + value + "]");
 					}
@@ -692,19 +692,19 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 			return value;
 		}
 		catch (IndexOutOfBoundsException ex) {
-			throw new InvalidPropertyException(getRootClass(), this.nestedPath + propertyName,
+			throw new org.springframework.beans.InvalidPropertyException(getRootClass(), this.nestedPath + propertyName,
 					"Index of out of bounds in property path '" + propertyName + "'", ex);
 		}
 		catch (NumberFormatException | TypeMismatchException ex) {
-			throw new InvalidPropertyException(getRootClass(), this.nestedPath + propertyName,
+			throw new org.springframework.beans.InvalidPropertyException(getRootClass(), this.nestedPath + propertyName,
 					"Invalid index in property path '" + propertyName + "'", ex);
 		}
 		catch (InvocationTargetException ex) {
-			throw new InvalidPropertyException(getRootClass(), this.nestedPath + propertyName,
+			throw new org.springframework.beans.InvalidPropertyException(getRootClass(), this.nestedPath + propertyName,
 					"Getter for property '" + actualName + "' threw exception", ex);
 		}
 		catch (Exception ex) {
-			throw new InvalidPropertyException(getRootClass(), this.nestedPath + propertyName,
+			throw new org.springframework.beans.InvalidPropertyException(getRootClass(), this.nestedPath + propertyName,
 					"Illegal attempt to get property '" + actualName + "' threw exception", ex);
 		}
 	}
@@ -719,7 +719,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	 * @throws BeansException in case of introspection failure
 	 */
 	@Nullable
-	protected PropertyHandler getPropertyHandler(String propertyName) throws BeansException {
+	protected PropertyHandler getPropertyHandler(String propertyName) throws org.springframework.beans.BeansException {
 		Assert.notNull(propertyName, "Property name must not be null");
 		AbstractNestablePropertyAccessor nestedPa = getPropertyAccessorForPropertyPath(propertyName);
 		return nestedPa.getLocalPropertyHandler(getFinalPath(nestedPa, propertyName));
@@ -746,7 +746,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	/**
 	 * Create a {@link NotWritablePropertyException} for the specified property.
 	 */
-	protected abstract NotWritablePropertyException createNotWritablePropertyException(String propertyName);
+	protected abstract org.springframework.beans.NotWritablePropertyException createNotWritablePropertyException(String propertyName);
 
 
 	private Object growArrayIfNecessary(Object array, int index, String name) {
@@ -798,7 +798,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		if (pa == this) {
 			return nestedPath;
 		}
-		return nestedPath.substring(PropertyAccessorUtils.getLastNestedPropertySeparatorIndex(nestedPath) + 1);
+		return nestedPath.substring(org.springframework.beans.PropertyAccessorUtils.getLastNestedPropertySeparatorIndex(nestedPath) + 1);
 	}
 
 	/**
@@ -808,7 +808,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	 */
 	@SuppressWarnings("unchecked")  // avoid nested generic
 	protected AbstractNestablePropertyAccessor getPropertyAccessorForPropertyPath(String propertyPath) {
-		int pos = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(propertyPath);
+		int pos = org.springframework.beans.PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(propertyPath);
 		// Handle nested properties recursively.
 		if (pos > -1) {
 			String nestedProperty = propertyPath.substring(0, pos);
@@ -842,7 +842,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				value = setDefaultValue(tokens);
 			}
 			else {
-				throw new NullValueInNestedPathException(getRootClass(), this.nestedPath + canonicalName);
+				throw new org.springframework.beans.NullValueInNestedPathException(getRootClass(), this.nestedPath + canonicalName);
 			}
 		}
 
@@ -877,7 +877,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	private PropertyValue createDefaultPropertyValue(PropertyTokenHolder tokens) {
 		TypeDescriptor desc = getPropertyTypeDescriptor(tokens.canonicalName);
 		if (desc == null) {
-			throw new NullValueInNestedPathException(getRootClass(), this.nestedPath + tokens.canonicalName,
+			throw new org.springframework.beans.NullValueInNestedPathException(getRootClass(), this.nestedPath + tokens.canonicalName,
 					"Could not determine property type for auto-growing a default value");
 		}
 		Object defaultValue = newValue(desc.getType(), desc, tokens.canonicalName);
@@ -911,11 +911,11 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				if (Modifier.isPrivate(ctor.getModifiers())) {
 					throw new IllegalAccessException("Auto-growing not allowed with private constructor: " + ctor);
 				}
-				return BeanUtils.instantiateClass(ctor);
+				return org.springframework.beans.BeanUtils.instantiateClass(ctor);
 			}
 		}
 		catch (Throwable ex) {
-			throw new NullValueInNestedPathException(getRootClass(), this.nestedPath + name,
+			throw new org.springframework.beans.NullValueInNestedPathException(getRootClass(), this.nestedPath + name,
 					"Could not instantiate property type [" + type.getName() + "] to auto-grow nested property path", ex);
 		}
 	}

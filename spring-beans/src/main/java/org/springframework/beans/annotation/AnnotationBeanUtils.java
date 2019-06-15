@@ -36,6 +36,8 @@ import org.springframework.util.StringValueResolver;
  * @author Juergen Hoeller
  * @since 2.0
  */
+
+/*注解 bean 工具*/
 public abstract class AnnotationBeanUtils {
 
 	/**
@@ -46,6 +48,7 @@ public abstract class AnnotationBeanUtils {
 	 * @param excludedProperties the names of excluded properties, if any
 	 * @see org.springframework.beans.BeanWrapper
 	 */
+	/*拷贝  参数 到 对象中 */
 	public static void copyPropertiesToBean(Annotation ann, Object bean, String... excludedProperties) {
 		copyPropertiesToBean(ann, bean, null, excludedProperties);
 	}
@@ -63,9 +66,13 @@ public abstract class AnnotationBeanUtils {
 	public static void copyPropertiesToBean(Annotation ann, Object bean, @Nullable StringValueResolver valueResolver,
 			String... excludedProperties) {
 
+		/*string 参数 不为 空   */
 		Set<String> excluded = (excludedProperties.length == 0 ? Collections.emptySet() :
+				/*string []  转换为  list  然后 直接 new hashset 中  */
 				new HashSet<>(Arrays.asList(excludedProperties)));
+		/*  注解 接口 获取注解类类型  然后获取方法  集合   */
 		Method[] annotationProperties = ann.annotationType().getDeclaredMethods();
+
 		BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(bean);
 		for (Method annotationProperty : annotationProperties) {
 			String propertyName = annotationProperty.getName();

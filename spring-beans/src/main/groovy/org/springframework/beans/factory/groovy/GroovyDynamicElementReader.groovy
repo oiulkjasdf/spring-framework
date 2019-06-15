@@ -18,6 +18,7 @@ package org.springframework.beans.factory.groovy
 
 import groovy.xml.StreamingMarkupBuilder
 import org.springframework.beans.factory.config.BeanDefinitionHolder
+import org.springframework.beans.factory.groovy.GroovyBeanDefinitionWrapper
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate
 import org.w3c.dom.Element
 

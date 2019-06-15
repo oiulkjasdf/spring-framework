@@ -46,7 +46,8 @@ import java.beans.PropertyDescriptor;
  * @see org.springframework.validation.BeanPropertyBindingResult
  * @see org.springframework.validation.DataBinder#initBeanPropertyAccess()
  */
-public interface BeanWrapper extends ConfigurablePropertyAccessor {
+/*这个接口  继承自  */
+public interface BeanWrapper extends org.springframework.beans.ConfigurablePropertyAccessor {
 
 	/**
 	 * Specify a limit for array and collection auto-growing.
@@ -86,6 +87,6 @@ public interface BeanWrapper extends ConfigurablePropertyAccessor {
 	 * @return the property descriptor for the specified property
 	 * @throws InvalidPropertyException if there is no such property
 	 */
-	PropertyDescriptor getPropertyDescriptor(String propertyName) throws InvalidPropertyException;
+	PropertyDescriptor getPropertyDescriptor(String propertyName) throws org.springframework.beans.InvalidPropertyException;
 
 }

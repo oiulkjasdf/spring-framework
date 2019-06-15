@@ -24,8 +24,12 @@ package org.springframework.beans;
  * @author Juergen Hoeller
  * @since 2.5.2
  */
+
+
+/*final  类 属性存取器工厂 */
 public final class PropertyAccessorFactory {
 
+	/*构造*/
 	private PropertyAccessorFactory() {
 	}
 
@@ -37,8 +41,10 @@ public final class PropertyAccessorFactory {
 	 * @return the property accessor
 	 * @see BeanWrapperImpl
 	 */
-	public static BeanWrapper forBeanPropertyAccess(Object target) {
-		return new BeanWrapperImpl(target);
+	/*bean 中 的允许存取的 方法*/
+	public static org.springframework.beans.BeanWrapper forBeanPropertyAccess(Object target) {
+		/*去这个对象中  构造了*/
+		return new org.springframework.beans.BeanWrapperImpl(target);
 	}
 
 	/**
@@ -48,8 +54,10 @@ public final class PropertyAccessorFactory {
 	 * @return the property accessor
 	 * @see DirectFieldAccessor
 	 */
-	public static ConfigurablePropertyAccessor forDirectFieldAccess(Object target) {
-		return new DirectFieldAccessor(target);
+	/*直接允许的属性*/
+	public static org.springframework.beans.ConfigurablePropertyAccessor forDirectFieldAccess(Object target) {
+		/*去另一个对象中 构造了*/
+		return new org.springframework.beans.DirectFieldAccessor(target);
 	}
 
 }

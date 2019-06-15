@@ -16,6 +16,7 @@
 
 package org.springframework.beans.factory
 
+import groovy.swing.factory.BeanFactory
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.core.ResolvableType
 

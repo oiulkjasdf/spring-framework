@@ -35,6 +35,8 @@ import org.springframework.lang.Nullable;
  * @see SimpleTypeConverter
  * @see BeanWrapperImpl
  */
+
+/*类型适配器*/
 public interface TypeConverter {
 
 	/**
@@ -52,7 +54,8 @@ public interface TypeConverter {
 	 * @see org.springframework.core.convert.converter.Converter
 	 */
 	@Nullable
-	<T> T convertIfNecessary(@Nullable Object value, @Nullable Class<T> requiredType) throws TypeMismatchException;
+	/*适配 如果有必要  一个对象 参数  一个类类型 参数*/
+	<T> T convertIfNecessary(@Nullable Object value, @Nullable Class<T> requiredType) throws com.sun.corba.se.impl.io.TypeMismatchException;
 
 	/**
 	 * Convert the value to the required type (if necessary from a String).
@@ -71,8 +74,9 @@ public interface TypeConverter {
 	 * @see org.springframework.core.convert.converter.Converter
 	 */
 	@Nullable
+	/*适配  如果有必要   是一个  重载方法  多了一个  方法参数*/
 	<T> T convertIfNecessary(@Nullable Object value, @Nullable Class<T> requiredType,
-			@Nullable MethodParameter methodParam) throws TypeMismatchException;
+			@Nullable MethodParameter methodParam) throws org.springframework.beans.TypeMismatchException;
 
 	/**
 	 * Convert the value to the required type (if necessary from a String).
