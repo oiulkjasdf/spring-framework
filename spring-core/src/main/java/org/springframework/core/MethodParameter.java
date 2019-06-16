@@ -214,7 +214,7 @@ public class MethodParameter {
 	/**
 	 * Return the class that declares the underlying Method or Constructor.
 	 */
-	/*获取类对象*/
+	/*获取默认类对象*/
 	public Class<?> getDeclaringClass() {
 		return this.executable.getDeclaringClass();
 	}
@@ -258,7 +258,7 @@ public class MethodParameter {
 	 * Return the {@link Parameter} descriptor for method/constructor parameter.
 	 * @since 5.0
 	 */
-	/*返回参数 */
+	/*获取参数 */
 	public Parameter getParameter() {
 		if (this.parameterIndex < 0) {
 			throw new IllegalStateException("Cannot retrieve Parameter descriptor for method return type");
@@ -275,6 +275,7 @@ public class MethodParameter {
 	 * Return the index of the method/constructor parameter.
 	 * @return the parameter index (-1 in case of the return type)
 	 */
+	/*获取是第几个参数 */
 	public int getParameterIndex() {
 		return this.parameterIndex;
 	}
@@ -283,6 +284,7 @@ public class MethodParameter {
 	 * Increase this parameter's nesting level.
 	 * @see #getNestingLevel()
 	 */
+	/*自增一个 后的嵌套等级 */
 	public void increaseNestingLevel() {
 		this.nestingLevel++;
 	}
@@ -291,6 +293,7 @@ public class MethodParameter {
 	 * Decrease this parameter's nesting level.
 	 * @see #getNestingLevel()
 	 */
+	/*下一个 嵌套等级  */
 	public void decreaseNestingLevel() {
 		getTypeIndexesPerLevel().remove(this.nestingLevel);
 		this.nestingLevel--;
@@ -301,6 +304,7 @@ public class MethodParameter {
 	 * (typically 1; e.g. in case of a List of Lists, 1 would indicate the
 	 * nested List, whereas 2 would indicate the element of the nested List).
 	 */
+	/*获取嵌套等级 */
 	public int getNestingLevel() {
 		return this.nestingLevel;
 	}
@@ -311,6 +315,7 @@ public class MethodParameter {
 	 * (or {@code null} for the default type index)
 	 * @see #getNestingLevel()
 	 */
+	/*设置  类型序列等级  入参一个 类型int  并放入  list 中*/
 	public void setTypeIndexForCurrentLevel(int typeIndex) {
 		getTypeIndexesPerLevel().put(this.nestingLevel, typeIndex);
 	}
@@ -322,6 +327,7 @@ public class MethodParameter {
 	 * @see #getNestingLevel()
 	 */
 	@Nullable
+	/*获取 类型 等级*/
 	public Integer getTypeIndexForCurrentLevel() {
 		return getTypeIndexForLevel(this.nestingLevel);
 	}
@@ -333,6 +339,7 @@ public class MethodParameter {
 	 * if none specified (indicating the default type index)
 	 */
 	@Nullable
+	/*获取类型等级 这几个东西来回调用  乱的很  。。。。*/
 	public Integer getTypeIndexForLevel(int nestingLevel) {
 		return getTypeIndexesPerLevel().get(nestingLevel);
 	}
@@ -340,6 +347,7 @@ public class MethodParameter {
 	/**
 	 * Obtain the (lazily constructed) type-indexes-per-level Map.
 	 */
+	/*获取  等级 */
 	private Map<Integer, Integer> getTypeIndexesPerLevel() {
 		if (this.typeIndexesPerLevel == null) {
 			this.typeIndexesPerLevel = new HashMap<>(4);
@@ -354,13 +362,17 @@ public class MethodParameter {
 	 * {@code MethodParameter} object (e.g. in case of the original being cached).
 	 * @since 4.3
 	 */
+	/*嵌套  */
 	public MethodParameter nested() {
+		/*1  先获取 本类的 方法参数*/
 		MethodParameter nestedParam = this.nestedMethodParameter;
 		if (nestedParam != null) {
 			return nestedParam;
 		}
 		nestedParam = clone();
+		/*先加一*/
 		nestedParam.nestingLevel = this.nestingLevel + 1;
+		/*塞入*/
 		this.nestedMethodParameter = nestedParam;
 		return nestedParam;
 	}
@@ -373,7 +385,9 @@ public class MethodParameter {
 	 * declaration in Kotlin.
 	 * @since 4.3
 	 */
+	/*是否是 可选的*/
 	public boolean isOptional() {
+		/*如果 类型 为 可选  或者 有允许空的注解 或者是 kotlin 反射父类   并且  ？？？   kotlin 是什么   */
 		return (getParameterType() == Optional.class || hasNullableAnnotation() ||
 				(org.springframework.core.KotlinDetector.isKotlinReflectPresent() &&
 						org.springframework.core.KotlinDetector.isKotlinType(getContainingClass()) &&
@@ -385,8 +399,10 @@ public class MethodParameter {
 	 * {@code Nullable} annotation, e.g. {@code javax.annotation.Nullable} or
 	 * {@code edu.umd.cs.findbugs.annotations.Nullable}.
 	 */
+	/*有可允许空的 注解*/
 	private boolean hasNullableAnnotation() {
 		for (Annotation ann : getParameterAnnotations()) {
+			/*“注解类型名 为 nullable   允许空”*/
 			if ("Nullable".equals(ann.annotationType().getSimpleName())) {
 				return true;
 			}
@@ -402,17 +418,21 @@ public class MethodParameter {
 	 * @see #isOptional()
 	 * @see #nested()
 	 */
+	/*返回 方法参数  嵌套 若果可以选择的话*/
 	public MethodParameter nestedIfOptional() {
+		/*参数类型是否可选  是  则 返回参数  不是  则返回此对象 */
 		return (getParameterType() == Optional.class ? nested() : this);
 	}
 
 	/**
 	 * Set a containing class to resolve the parameter type against.
 	 */
+	/*设置 包含类*/
 	void setContainingClass(Class<?> containingClass) {
 		this.containingClass = containingClass;
 	}
 
+	/*获取包含类*/
 	public Class<?> getContainingClass() {
 		Class<?> containingClass = this.containingClass;
 		return (containingClass != null ? containingClass : getDeclaringClass());
@@ -421,6 +441,7 @@ public class MethodParameter {
 	/**
 	 * Set a resolved (generic) parameter type.
 	 */
+	/*设置 参数类型 */
 	void setParameterType(@Nullable Class<?> parameterType) {
 		this.parameterType = parameterType;
 	}
@@ -429,14 +450,17 @@ public class MethodParameter {
 	 * Return the type of the method/constructor parameter.
 	 * @return the parameter type (never {@code null})
 	 */
+	/*获取参数类型*/
 	public Class<?> getParameterType() {
 		Class<?> paramType = this.parameterType;
 		if (paramType == null) {
 			if (this.parameterIndex < 0) {
 				Method method = getMethod();
+				/*犯法返回类型  其他 则没有参数*/
 				paramType = (method != null ? method.getReturnType() : void.class);
 			}
 			else {
+				/*获取参数类型  参数 是其中第几个  */
 				paramType = this.executable.getParameterTypes()[this.parameterIndex];
 			}
 			this.parameterType = paramType;
@@ -706,6 +730,7 @@ public class MethodParameter {
 	}
 
 	@Override
+	/*直接获取本类*/
 	public MethodParameter clone() {
 		return new MethodParameter(this);
 	}
