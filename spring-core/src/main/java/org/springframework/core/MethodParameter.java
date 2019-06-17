@@ -473,16 +473,22 @@ public class MethodParameter {
 	 * @return the parameter type (never {@code null})
 	 * @since 3.0
 	 */
+	/*获取通用参数类型*/
 	public Type getGenericParameterType() {
 		Type paramType = this.genericParameterType;
+		/*为空*/
 		if (paramType == null) {
+			/*序列 小于0 */
 			if (this.parameterIndex < 0) {
 				Method method = getMethod();
+				/*从方法中获取 普通参数类型  或者  void . class   牛皮哦*/
 				paramType = (method != null ? method.getGenericReturnType() : void.class);
 			}
 			else {
+				/*不小于0  获取类型数组*/
 				Type[] genericParameterTypes = this.executable.getGenericParameterTypes();
 				int index = this.parameterIndex;
+				/*属于构造  并且是内部类  长度等于 参数量减一*/
 				if (this.executable instanceof Constructor &&
 						ClassUtils.isInnerClass(this.executable.getDeclaringClass()) &&
 						genericParameterTypes.length == this.executable.getParameterCount() - 1) {
@@ -505,11 +511,16 @@ public class MethodParameter {
 	 * @since 3.1
 	 * @see #getNestingLevel()
 	 */
+	/*获取嵌套参数类型*/
 	public Class<?> getNestedParameterType() {
 		if (this.nestingLevel > 1) {
+			/*获取普通参数类型*/
 			Type type = getGenericParameterType();
+			/*第二层开始*/
 			for (int i = 2; i <= this.nestingLevel; i++) {
+				/*属于参数化类型*/
 				if (type instanceof ParameterizedType) {
+					/*获取实际类型*/
 					Type[] args = ((ParameterizedType) type).getActualTypeArguments();
 					Integer index = getTypeIndexForLevel(i);
 					type = args[index != null ? index : args.length - 1];
@@ -538,6 +549,7 @@ public class MethodParameter {
 	 * @since 4.2
 	 * @see #getNestingLevel()
 	 */
+	/*获取嵌套普通注解*/
 	public Type getNestedGenericParameterType() {
 		if (this.nestingLevel > 1) {
 			Type type = getGenericParameterType();
@@ -558,6 +570,7 @@ public class MethodParameter {
 	/**
 	 * Return the annotations associated with the target method/constructor itself.
 	 */
+	/*获取方法注解*/
 	public Annotation[] getMethodAnnotations() {
 		return adaptAnnotationArray(getAnnotatedElement().getAnnotations());
 	}
@@ -568,6 +581,7 @@ public class MethodParameter {
 	 * @return the annotation object, or {@code null} if not found
 	 */
 	@Nullable
+	/*获取方法注解*/
 	public <A extends Annotation> A getMethodAnnotation(Class<A> annotationType) {
 		A annotation = getAnnotatedElement().getAnnotation(annotationType);
 		return (annotation != null ? adaptAnnotation(annotation) : null);
@@ -579,6 +593,7 @@ public class MethodParameter {
 	 * @since 4.3
 	 * @see #getMethodAnnotation(Class)
 	 */
+	/*有方法注解*/
 	public <A extends Annotation> boolean hasMethodAnnotation(Class<A> annotationType) {
 		return getAnnotatedElement().isAnnotationPresent(annotationType);
 	}
@@ -586,11 +601,13 @@ public class MethodParameter {
 	/**
 	 * Return the annotations associated with the specific method/constructor parameter.
 	 */
+	/*获取参数注解集合*/
 	public Annotation[] getParameterAnnotations() {
 		Annotation[] paramAnns = this.parameterAnnotations;
 		if (paramAnns == null) {
 			Annotation[][] annotationArray = this.executable.getParameterAnnotations();
 			int index = this.parameterIndex;
+			/*属于构造  并且是内部类  长度等于 参数量减一  和获取普通的 相似*/
 			if (this.executable instanceof Constructor &&
 					ClassUtils.isInnerClass(this.executable.getDeclaringClass()) &&
 					annotationArray.length == this.executable.getParameterCount() - 1) {
@@ -621,9 +638,11 @@ public class MethodParameter {
 	 */
 	@SuppressWarnings("unchecked")
 	@Nullable
+	/*获取参数注解*/
 	public <A extends Annotation> A getParameterAnnotation(Class<A> annotationType) {
 		Annotation[] anns = getParameterAnnotations();
 		for (Annotation ann : anns) {
+			/*native 方法 存在*/
 			if (annotationType.isInstance(ann)) {
 				return (A) ann;
 			}
@@ -636,6 +655,7 @@ public class MethodParameter {
 	 * @param annotationType the annotation type to look for
 	 * @see #getParameterAnnotation(Class)
 	 */
+	/*有参数注解*/
 	public <A extends Annotation> boolean hasParameterAnnotation(Class<A> annotationType) {
 		return (getParameterAnnotation(annotationType) != null);
 	}
@@ -646,6 +666,7 @@ public class MethodParameter {
 	 * this point; it just allows discovery to happen when the application calls
 	 * {@link #getParameterName()} (if ever).
 	 */
+	/*初始化参数名字发现*/
 	public void initParameterNameDiscovery(@Nullable org.springframework.core.ParameterNameDiscoverer parameterNameDiscoverer) {
 		this.parameterNameDiscoverer = parameterNameDiscoverer;
 	}
@@ -658,6 +679,7 @@ public class MethodParameter {
 	 * has been set to begin with)
 	 */
 	@Nullable
+	/*获取参数名字*/
 	public String getParameterName() {
 		if (this.parameterIndex < 0) {
 			return null;
@@ -700,6 +722,7 @@ public class MethodParameter {
 	 * @return the post-processed annotation array (or simply the original one)
 	 * @since 4.2
 	 */
+	/*适配 注解集合*/
 	protected Annotation[] adaptAnnotationArray(Annotation[] annotations) {
 		return annotations;
 	}
@@ -746,11 +769,13 @@ public class MethodParameter {
 	 * @deprecated as of 5.0, in favor of {@link #forExecutable}
 	 */
 	@Deprecated
+	/*方法或者构造器*/
 	public static MethodParameter forMethodOrConstructor(Object methodOrConstructor, int parameterIndex) {
 		if (!(methodOrConstructor instanceof Executable)) {
 			throw new IllegalArgumentException(
 					"Given object [" + methodOrConstructor + "] is neither a Method nor a Constructor");
 		}
+		/*调用同类下面那个方法*/
 		return forExecutable((Executable) methodOrConstructor, parameterIndex);
 	}
 
@@ -763,10 +788,13 @@ public class MethodParameter {
 	 * @return the corresponding MethodParameter instance
 	 * @since 5.0
 	 */
+	/*可执行的 */
 	public static MethodParameter forExecutable(Executable executable, int parameterIndex) {
+		/*属于方法*/
 		if (executable instanceof Method) {
 			return new MethodParameter((Method) executable, parameterIndex);
 		}
+		/*属于构造器*/
 		else if (executable instanceof Constructor) {
 			return new MethodParameter((Constructor<?>) executable, parameterIndex);
 		}
@@ -783,13 +811,16 @@ public class MethodParameter {
 	 * @return the corresponding MethodParameter instance
 	 * @since 5.0
 	 */
+	/**/
 	public static MethodParameter forParameter(Parameter parameter) {
 		return forExecutable(parameter.getDeclaringExecutable(), findParameterIndex(parameter));
 	}
 
+	/*找参数  */
 	protected static int findParameterIndex(Parameter parameter) {
 		Executable executable = parameter.getDeclaringExecutable();
 		Parameter[] allParams = executable.getParameters();
+		/*所有的参数  for循环 地址相等或者 值相等*/
 		// Try first with identity checks for greater performance.
 		for (int i = 0; i < allParams.length; i++) {
 			if (parameter == allParams[i]) {
@@ -822,6 +853,7 @@ public class MethodParameter {
 	/**
 	 * Inner class to avoid a hard dependency on Kotlin at runtime.
 	 */
+	/*kotlin  安卓的 ？*/
 	private static class KotlinDelegate {
 
 		/**
