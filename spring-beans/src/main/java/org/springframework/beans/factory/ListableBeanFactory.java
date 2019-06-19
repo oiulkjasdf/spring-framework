@@ -66,6 +66,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @return if this bean factory contains a bean definition with the given name
 	 * @see #containsBean
 	 */
+	/*所欲定义bean中是否有 */
 	boolean containsBeanDefinition(String beanName);
 
 	/**
@@ -75,6 +76,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * other means than bean definitions.
 	 * @return the number of beans defined in the factory
 	 */
+	/*获取定义bean 的数量*/
 	int getBeanDefinitionCount();
 
 	/**
@@ -85,6 +87,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @return the names of all beans defined in this factory,
 	 * or an empty array if none defined
 	 */
+	/*获取 定义名字集合*/
 	String[] getBeanDefinitionNames();
 
 	/**
@@ -114,6 +117,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @see FactoryBean#getObjectType
 	 * @see BeanFactoryUtils#beanNamesForTypeIncludingAncestors(ListableBeanFactory, ResolvableType)
 	 */
+	/*通过类型获取bean 名*/
 	String[] getBeanNamesForType(ResolvableType type);
 
 	/**
@@ -141,6 +145,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @see FactoryBean#getObjectType
 	 * @see BeanFactoryUtils#beanNamesForTypeIncludingAncestors(ListableBeanFactory, Class)
 	 */
+	/*获取bean名通过类型*/
 	String[] getBeanNamesForType(@Nullable Class<?> type);
 
 	/**
@@ -174,6 +179,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @see FactoryBean#getObjectType
 	 * @see BeanFactoryUtils#beanNamesForTypeIncludingAncestors(ListableBeanFactory, Class, boolean, boolean)
 	 */
+	/*获取bean 名 通过类型*/
 	String[] getBeanNamesForType(@Nullable Class<?> type, boolean includeNonSingletons, boolean allowEagerInit);
 
 	/**
@@ -204,6 +210,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @see FactoryBean#getObjectType
 	 * @see BeanFactoryUtils#beansOfTypeIncludingAncestors(ListableBeanFactory, Class)
 	 */
+	/*获取bean名通过类型*/
 	<T> Map<String, T> getBeansOfType(@Nullable Class<T> type) throws BeansException;
 
 	/**
@@ -252,6 +259,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @since 4.0
 	 * @see #findAnnotationOnBean
 	 */
+	/*通过注解获取bean名*/
 	String[] getBeanNamesForAnnotation(Class<? extends Annotation> annotationType);
 
 	/**
@@ -266,6 +274,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @since 3.0
 	 * @see #findAnnotationOnBean
 	 */
+	/*通过注解获取bean名*/
 	Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationType) throws BeansException;
 
 	/**
@@ -281,6 +290,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @see #getBeansWithAnnotation
 	 */
 	@Nullable
+	/*从bean中获取注解*/
 	<A extends Annotation> A findAnnotationOnBean(String beanName, Class<A> annotationType)
 			throws NoSuchBeanDefinitionException;
 

@@ -80,16 +80,20 @@ import org.springframework.util.StringUtils;
  * @see ResolvableTypeProvider
  */
 @SuppressWarnings("serial")
+/*可分解的类型*/
 public class ResolvableType implements Serializable {
 
 	/**
 	 * {@code ResolvableType} returned when no value is available. {@code NONE} is used
 	 * in preference to {@code null} so that multiple method calls can be safely chained.
 	 */
+	/*构造自己一个空对象*/
 	public static final ResolvableType NONE = new ResolvableType(EmptyType.INSTANCE, null, null, 0);
 
+	/*自己一个 空集合*/
 	private static final ResolvableType[] EMPTY_TYPES_ARRAY = new ResolvableType[0];
 
+	/*这是什么鬼  referencehashmap*/
 	private static final ConcurrentReferenceHashMap<ResolvableType, ResolvableType> cache =
 			new ConcurrentReferenceHashMap<>(256);
 
@@ -97,12 +101,14 @@ public class ResolvableType implements Serializable {
 	/**
 	 * The underlying Java type being managed.
 	 */
+	/*管理的java 基础类型*/
 	private final Type type;
 
 	/**
 	 * Optional provider for the type.
 	 */
 	@Nullable
+	/*类型生产者  todo  要看*/
 	private final TypeProvider typeProvider;
 
 	/**
@@ -115,21 +121,27 @@ public class ResolvableType implements Serializable {
 	 * The component type for an array or {@code null} if the type should be deduced.
 	 */
 	@Nullable
+	/*final 一个自己*/
 	private final ResolvableType componentType;
 
 	@Nullable
+	/*hash */
 	private final Integer hash;
 
 	@Nullable
+	/*一个类类型  */
 	private Class<?> resolved;
 
 	@Nullable
+	/*父类 一个 解析类型的自己 volatile  不会因为 java 优化器 而省略*/
 	private volatile ResolvableType superType;
 
 	@Nullable
+	/*一个自己的数组 */
 	private volatile ResolvableType[] interfaces;
 
 	@Nullable
+	/*又一个自己的数组*/
 	private volatile ResolvableType[] generics;
 
 
@@ -137,6 +149,7 @@ public class ResolvableType implements Serializable {
 	 * Private constructor used to create a new {@link ResolvableType} for cache key purposes,
 	 * with no upfront resolution.
 	 */
+	/*构造*/
 	private ResolvableType(
 			Type type, @Nullable TypeProvider typeProvider, @Nullable VariableResolver variableResolver) {
 
@@ -197,7 +210,9 @@ public class ResolvableType implements Serializable {
 	/**
 	 * Return the underling Java {@link Type} being managed.
 	 */
+	/*获取类型*/
 	public Type getType() {
+		/*可序列化类型 拆开 类型 */
 		return SerializableTypeWrapper.unwrap(this.type);
 	}
 
@@ -206,6 +221,7 @@ public class ResolvableType implements Serializable {
 	 * otherwise {@code null}.
 	 */
 	@Nullable
+	/*获取未处理的类型*/
 	public Class<?> getRawClass() {
 		if (this.type == this.resolved) {
 			return this.resolved;
@@ -224,6 +240,7 @@ public class ResolvableType implements Serializable {
 	 * never return {@code null}. This method is primarily to provide access to additional
 	 * type information or meta-data that alternative JVM languages may provide.
 	 */
+	/*获取源*/
 	public Object getSource() {
 		Object source = (this.typeProvider != null ? this.typeProvider.getSource() : null);
 		return (source != null ? source : this.type);
@@ -237,6 +254,7 @@ public class ResolvableType implements Serializable {
 	 * @see #getRawClass()
 	 * @see #resolve(Class)
 	 */
+	/*解析 obj */
 	public Class<?> toClass() {
 		return resolve(Object.class);
 	}
@@ -247,6 +265,7 @@ public class ResolvableType implements Serializable {
 	 * @since 4.2
 	 * @see #isAssignableFrom(Class)
 	 */
+	/*是 实例 */
 	public boolean isInstance(@Nullable Object obj) {
 		return (obj != null && isAssignableFrom(obj.getClass()));
 	}
@@ -386,6 +405,7 @@ public class ResolvableType implements Serializable {
 	 * {@link #NONE} if this type does not represent an array.
 	 * @see #isArray()
 	 */
+	/*获取挂件的类型*/
 	public ResolvableType getComponentType() {
 		if (this == NONE) {
 			return NONE;
@@ -1437,6 +1457,7 @@ public class ResolvableType implements Serializable {
 	/**
 	 * Strategy interface used to resolve {@link TypeVariable TypeVariables}.
 	 */
+	/*变量解析*/
 	interface VariableResolver extends Serializable {
 
 		/**
@@ -1450,6 +1471,7 @@ public class ResolvableType implements Serializable {
 		 * @return the resolved variable, or {@code null} if not found
 		 */
 		@Nullable
+		/*解析类型变量*/
 		ResolvableType resolveVariable(TypeVariable<?> variable);
 	}
 

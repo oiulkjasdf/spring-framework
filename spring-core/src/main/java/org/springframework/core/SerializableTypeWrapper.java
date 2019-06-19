@@ -90,6 +90,7 @@ final class SerializableTypeWrapper {
 	@SuppressWarnings("unchecked")
 	public static <T extends Type> T unwrap(T type) {
 		Type unwrapped = type;
+		/*属于可序列化类型的 代理对象*/
 		while (unwrapped instanceof SerializableTypeProxy) {
 			unwrapped = ((SerializableTypeProxy) type).getTypeProvider().getType();
 		}
